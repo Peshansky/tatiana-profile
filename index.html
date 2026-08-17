@@ -1,4 +1,4 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<!doctype html><html lang="ru" data-fs="l"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Татьяна · Девять систем</title><style>
@@ -70,8 +70,8 @@ details .tw{margin-top:.4rem}
 <header>
 <div class="tools">
 <div class="fs" role="group" aria-label="Размер шрифта">
-<button data-fs="base" class="on" aria-label="Обычный шрифт">А</button>
-<button data-fs="l" aria-label="Крупный шрифт">А</button>
+<button data-fs="base" aria-label="Обычный шрифт">А</button>
+<button data-fs="l" class="on" aria-label="Крупный шрифт">А</button>
 <button data-fs="xl" aria-label="Очень крупный шрифт">А</button>
 </div>
 <button id="theme" aria-label="Переключить тему">Тема</button>
@@ -247,6 +247,6 @@ const fbs=[...document.querySelectorAll(".fs button")];
 const setFS=v=>{if(v==="base")delete R.dataset.fs;else R.dataset.fs=v;
  fbs.forEach(b=>b.classList.toggle("on",b.dataset.fs===v));mem.set("fs",v);};
 fbs.forEach(b=>b.onclick=()=>setFS(b.dataset.fs));
-setFS(mem.get("fs")||"base");
+setFS(mem.get("fs")||"l");
 </script>
 </body></html>
