@@ -6,13 +6,24 @@
 html[data-theme=dark]{--bg:#1c1a17;--fg:#e8e2d8;--muted:#9a917f;--accent:#d9a05b;--card:#26231f;--line:#3a352e;--chip:#2c2823}
 @media(prefers-color-scheme:dark){html:not([data-theme=light]){--bg:#1c1a17;--fg:#e8e2d8;--muted:#9a917f;--accent:#d9a05b;--card:#26231f;--line:#3a352e;--chip:#2c2823}}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--fg);font:18px/1.65 Georgia,'Times New Roman',serif;padding-bottom:4rem}
+html{font-size:calc(16px * var(--k,1))}
+html[data-fs=l]{--k:1.12}
+html[data-fs=xl]{--k:1.25}
+body{background:var(--bg);color:var(--fg);font:1.125rem/1.65 Georgia,'Times New Roman',serif;padding-bottom:4rem}
 header{max-width:52rem;margin:0 auto;padding:3.2rem 1.2rem .6rem;text-align:center;position:relative}
 header .over{font-family:system-ui,sans-serif;font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent)}
 header h1{font-size:2.1rem;font-weight:normal;letter-spacing:.02em;margin-top:.4rem}
 header p.meta{color:var(--muted);margin-top:.5rem;font-style:italic}
-#theme{position:absolute;top:1rem;right:1.1rem;font-family:system-ui,sans-serif;font-size:.8rem;color:var(--muted);
- background:none;border:1px solid var(--line);border-radius:2rem;padding:.3rem .8rem;cursor:pointer}
+.tools{position:absolute;top:1rem;right:1.1rem;display:flex;gap:.4rem;align-items:center}
+.tools button{font-family:system-ui,sans-serif;color:var(--muted);background:none;
+ border:1px solid var(--line);border-radius:2rem;cursor:pointer;line-height:1}
+#theme{font-size:.8rem;padding:.35rem .8rem}
+.fs{display:flex;gap:.15rem;border:1px solid var(--line);border-radius:2rem;padding:.12rem}
+.fs button{border-color:transparent;padding:.2rem .5rem;font-family:Georgia,serif}
+.fs button.on{color:var(--accent);border-color:var(--accent)}
+.fs button[data-fs=base]{font-size:.72rem}
+.fs button[data-fs=l]{font-size:.88rem}
+.fs button[data-fs=xl]{font-size:1.02rem}
 nav{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);z-index:5}
 nav .row{max-width:52rem;margin:0 auto;display:flex;gap:.25rem;overflow-x:auto;padding:.6rem 1rem;scrollbar-width:none}
 nav .row::-webkit-scrollbar{display:none}
@@ -40,8 +51,8 @@ li{margin:.5rem 0}
 .note{color:var(--muted);font-size:.9rem;font-style:italic;text-align:center;margin-top:1.6rem}
 footer{max-width:52rem;margin:2.5rem auto 0;padding:1.2rem;color:var(--muted);font-size:.78rem;
  font-family:system-ui,sans-serif;text-align:center;border-top:1px solid var(--line)}
-@media(max-width:600px){body{font-size:17px}header h1{font-size:1.55rem}header{padding-top:3.4rem}
- #theme{top:.7rem;right:.8rem}.grid{grid-template-columns:1fr}}
+@media(max-width:600px){body{font-size:1.0625rem}header h1{font-size:1.55rem}header{padding-top:3.6rem}
+ .tools{top:.7rem;right:.8rem}.grid{grid-template-columns:1fr}}
 
 .tw{overflow-x:auto;margin:.9rem 0;border:1px solid var(--line);border-radius:.7rem}
 table{border-collapse:collapse;width:100%;font-family:system-ui,sans-serif;font-size:.82rem;line-height:1.45}
@@ -57,7 +68,14 @@ details .tw{margin-top:.4rem}
 
 </style></head><body>
 <header>
+<div class="tools">
+<div class="fs" role="group" aria-label="Размер шрифта">
+<button data-fs="base" class="on" aria-label="Обычный шрифт">А</button>
+<button data-fs="l" aria-label="Крупный шрифт">А</button>
+<button data-fs="xl" aria-label="Очень крупный шрифт">А</button>
+</div>
 <button id="theme" aria-label="Переключить тему">Тема</button>
+</div>
 <div class="over">Девять систем · сквозной профиль</div>
 <h1>Татьяна Елизарова</h1>
 <p class="meta">28 сентября 1983 · 07:10 · Красноярск</p>
@@ -219,9 +237,16 @@ bs.forEach(b=>b.onclick=()=>{bs.forEach(x=>x.classList.remove("on"));ss.forEach(
  b.classList.add("on");ss[+b.dataset.i].classList.add("on");window.scrollTo({top:0,behavior:"smooth"});
  history.replaceState(null,"","#"+encodeURIComponent(b.textContent));});
 const h=decodeURIComponent(location.hash.slice(1));if(h){const b=bs.find(x=>x.textContent===h);if(b)b.click();}
+const mem={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},
+ set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
 const T=document.getElementById("theme"),R=document.documentElement;
-const saved=localStorage.getItem("theme");if(saved)R.dataset.theme=saved;
+const saved=mem.get("theme");if(saved)R.dataset.theme=saved;
 T.onclick=()=>{const cur=R.dataset.theme||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");
- const nxt=cur==="dark"?"light":"dark";R.dataset.theme=nxt;localStorage.setItem("theme",nxt);};
+ const nxt=cur==="dark"?"light":"dark";R.dataset.theme=nxt;mem.set("theme",nxt);};
+const fbs=[...document.querySelectorAll(".fs button")];
+const setFS=v=>{if(v==="base")delete R.dataset.fs;else R.dataset.fs=v;
+ fbs.forEach(b=>b.classList.toggle("on",b.dataset.fs===v));mem.set("fs",v);};
+fbs.forEach(b=>b.onclick=()=>setFS(b.dataset.fs));
+setFS(mem.get("fs")||"base");
 </script>
 </body></html>
